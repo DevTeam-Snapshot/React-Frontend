@@ -1,47 +1,39 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { sendChatMessage } from './api';
 
 export default function App() {
-  const [file, setFile] = useState(null);
-  const [preview, setPreview] = useState('');
+  const [input, setInput] = useState('');
+  const [customers, setCustomers] = useState([]);
   const [message, setMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => () => {
-    if (preview) URL.revokeObjectURL(preview);
-  }, [preview]);
-
-  const selectImage = (event) => {
-    const selectedFile = event.target.files?.[0];
-    if (!selectedFile) return;
-    if (!selectedFile.type.startsWith('image/')) {
-      setMessage('이미지 파일만 선택할 수 있습니다.');
-      return;
-    }
-    if (preview) URL.revokeObjectURL(preview);
-    setFile(selectedFile);
-    setPreview(URL.createObjectURL(selectedFile));
+  const submitMessage = async (event) => {
+    event.preventDefault();
+    if (!input.trim()) return;
+    setIsLoading(true);
     setMessage('');
-  };
-
-  const uploadImage = () => {
-    if (!file) {
-      setMessage('사진을 먼저 선택하세요.');
-      return;
+    try {
+      const response = await sendChatMessage(input.trim());
+      setCustomers(response.customers || []);
+      setMessage(response.message);
+    } catch {
+      setCustomers([]);
+      setMessage('Backend에 연결할 수 없습니다. 서버가 실행 중인지 확인하세요.');
+    } finally {
+      setIsLoading(false);
     }
-    setMessage('사진이 화면에 등록되었습니다.');
   };
 
   return (
     <main className="app">
-      <h1>사진 업로드</h1>
-      <label className="picker" htmlFor="image-input">
-        {preview ? <img src={preview} alt="선택한 사진 미리보기" /> : <span>사진 선택</span>}
-        <input id="image-input" type="file" accept="image/*" onChange={selectImage} />
-      </label>
-      {file && <p className="filename">{file.name}</p>}
-      <button type="button" onClick={uploadImage}>
-        화면에 등록
-      </button>
+      <h1>고객 조회</h1>
+      <form onSubmit={submitMessage}>
+        <label htmlFor="message-input">요청 메시지</label>
+        <input id="message-input" value={input} onChange={(event) => setInput(event.target.value)} placeholder="고객리스트 알려줘" />
+        <button type="submit" disabled={isLoading}>{isLoading ? '조회 중...' : '전송'}</button>
+      </form>
       {message && <p className="message">{message}</p>}
+      {customers.length > 0 && <p className="customers">고객 목록: {customers.map((customer) => customer.name).join(', ')}</p>}
     </main>
   );
 }
