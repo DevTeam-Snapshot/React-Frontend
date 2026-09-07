@@ -23,10 +23,10 @@ npm install
 npm run dev
 ```
 
-개발 서버 실행 후 터미널에 표시된 주소로 접속합니다. Vite 기본 주소는 다음과 같습니다.
+개발 서버 실행 후 터미널에 표시된 주소로 접속합니다. 개발 서버 포트는 `3000`으로 설정되어 있습니다.
 
 ```text
-http://localhost:5173
+http://localhost:3000
 ```
 
 ## 사용 방법
@@ -49,13 +49,13 @@ docker build -t react-frontend:test .
 컨테이너 실행:
 
 ```bash
-docker run --rm -p 8080:80 react-frontend:test
+docker run --rm -p 3000:80 react-frontend:test
 ```
 
 브라우저에서 다음 주소로 접속합니다.
 
 ```text
-http://localhost:8080
+http://localhost:3000
 ```
 
 ## 주요 파일
