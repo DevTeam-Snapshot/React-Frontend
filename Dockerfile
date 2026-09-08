@@ -27,6 +27,11 @@ RUN npm install
 
 # React source code copy and install librarynX
 COPY . .
+
+# Backend API address embedded by Vite during the frontend build
+ARG VITE_API_BASE_URL=http://localhost:9000
+ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
+
 RUN npm run build
 
 # NginX image for displaying React screen image to web
