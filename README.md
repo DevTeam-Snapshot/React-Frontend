@@ -1,13 +1,12 @@
 # React-Frontend
 
-사진을 선택하고 미리보기로 확인한 뒤 화면에 등록하는 React Frontend 초기 화면입니다.
+질문과 DB index를 Backend에 전달하고, DB text와 vLLM answer를 표시하는 로컬 연동 화면입니다.
 
 ## 주요 기능
 
-- 이미지 파일 선택
-- 선택한 이미지 미리보기
-- 선택한 파일명 표시
-- `화면에 등록` 버튼으로 등록 상태 메시지 표시
+- 질문 및 DB index 입력
+- Backend `POST /api/integration-test` 호출
+- PostgreSQL 조회값과 vLLM 생성 답변 표시
 
 ## 실행 환경
 
@@ -31,12 +30,7 @@ http://localhost:3000
 
 ## 사용 방법
 
-1. `사진 선택` 영역을 클릭합니다.
-2. 이미지 파일을 선택합니다.
-3. 선택한 이미지의 미리보기를 확인합니다.
-4. `화면에 등록` 버튼을 클릭합니다.
-
-이미지가 아닌 파일을 선택하면 오류 메시지가 표시됩니다.
+Backend를 `http://localhost:9000`에서 먼저 실행합니다. 다른 주소를 사용할 경우 `.env`의 `VITE_API_BASE_URL`을 변경합니다.
 
 ## Docker 실행
 
@@ -63,12 +57,12 @@ http://localhost:3000
 | 파일 | 역할 |
 | --- | --- |
 | `src/main.jsx` | React 앱 시작점 |
-| `src/App.jsx` | 사진 선택, 미리보기, 등록 상태 처리 |
+| `src/App.jsx` | 질문/index 입력 및 응답 표시 |
+| `src/api.js` | Backend API 호출 |
 | `src/styles.css` | 화면 스타일 |
 | `Dockerfile` | React 빌드 및 Nginx 이미지 생성 |
 | `nginx.conf` | Nginx 정적 파일 및 SPA 라우팅 설정 |
 
 ## 현재 제한사항
 
-- 선택한 이미지를 서버나 데이터베이스에 저장하지 않습니다.
-- 새로고침하면 선택한 이미지와 등록 상태가 초기화됩니다.
+- 로컬 인터페이스 검증용이며 성능 검증은 GPU VM에서 진행합니다.

@@ -1,24 +1,23 @@
 import { useState } from 'react';
-import { sendChatMessage } from './api';
+import { askQuestion } from './api';
 
 export default function App() {
   const [input, setInput] = useState('');
-  const [customers, setCustomers] = useState([]);
-  const [message, setMessage] = useState('');
+  const [index, setIndex] = useState(1);
+  const [result, setResult] = useState(null);
+  const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   const submitMessage = async (event) => {
     event.preventDefault();
     if (!input.trim()) return;
     setIsLoading(true);
-    setMessage('');
+    setError('');
     try {
-      const response = await sendChatMessage(input.trim());
-      setCustomers(response.customers || []);
-      setMessage(response.message);
-    } catch {
-      setCustomers([]);
-      setMessage('Backend에 연결할 수 없습니다. 서버가 실행 중인지 확인하세요.');
+      setResult(await askQuestion(input.trim(), index));
+    } catch (requestError) {
+      setResult(null);
+      setError(requestError.message || 'Backend에 연결할 수 없습니다.');
     } finally {
       setIsLoading(false);
     }
@@ -26,14 +25,16 @@ export default function App() {
 
   return (
     <main className="app">
-      <h1>고객 조회</h1>
+      <h1>로컬 AI 연동 테스트</h1>
       <form onSubmit={submitMessage}>
-        <label htmlFor="message-input">요청 메시지</label>
-        <input id="message-input" value={input} onChange={(event) => setInput(event.target.value)} placeholder="고객리스트 알려줘" />
-        <button type="submit" disabled={isLoading}>{isLoading ? '조회 중...' : '전송'}</button>
+        <label htmlFor="question-input">질문</label>
+        <input id="question-input" value={input} onChange={(event) => setInput(event.target.value)} placeholder="안녕" minLength={1} maxLength={1000} required />
+        <label htmlFor="index-input">DB index</label>
+        <input id="index-input" type="number" min="1" value={index} onChange={(event) => setIndex(Number(event.target.value))} required />
+        <button type="submit" disabled={isLoading}>{isLoading ? '응답 대기 중...' : '질문하기'}</button>
       </form>
-      {message && <p className="message">{message}</p>}
-      {customers.length > 0 && <p className="customers">고객 목록: {customers.map((customer) => customer.name).join(', ')}</p>}
+      {error && <p className="message">{error}</p>}
+      {result && <section className="result"><p><strong>Index:</strong> {result.index}</p><p><strong>DB text:</strong> {result.db_text}</p><p><strong>Model answer:</strong> {result.model_answer}</p></section>}
     </main>
   );
 }
