@@ -1,44 +1,22 @@
-# Overall flow
-#  Node.js 컨테이너
-#  → npm install
-#  → npm run build
-#  → dist 생성
-#
-#  Nginx 컨테이너
-#  → dist 복사
-#  → React 화면 제공
-#
-#  실행할 때는 Windows의 8080번 포트를 컨테이너의 80번 포트와 연결합니다.
+# React 개발 환경 전용 Dockerfile
+# - Nginx를 사용하지 않고, Node.js 개발 서버(Vite / CRA)를 직접 띄워 실시간 반영(Hot Reload)을 지원합니다.
 
-#  Node.js : React 실행용 개발 도구
-#  Nginx : 완성된 React 결과물 서비스 서버입
-#  Dockerfile의 멀티 스테이지 빌드
-#  최종 이미지에 Node.js와 소스 코드 넣지 않고, 완성된 화면 파일만 Nginx에 넣기 위한 방식
+# 1. Base Image: Node.js 20 (경량화 alpine 버전)
+FROM node:20-alpine
 
-# React Node.js, alpine small linux
-FROM node:20-alpine AS build
-
-# Container work place
+# 2. 컨테이너 내부 작업 디렉토리 설정
 WORKDIR /app
 
-# React packeage info copy and install library
+# 3. 패키지 파일 복사 및 의존성 라이브러리 설치 (캐싱 활용)
 COPY package*.json ./
 RUN npm install
 
-# React source code copy and install librarynX
+# 4. 소스 코드 전체 복사
 COPY . .
-RUN npm run build
 
-# NginX image for displaying React screen image to web
-FROM nginx:alpine
+# 5. React 개발 서버 포트 노출 (Vite 기본 포트: 5173 / Create-React-App은 3000)
+# 프로젝트에 맞는 포트로 사용하세요. (Vite 사용 기준 5173)
+EXPOSE 5173
 
-# copy dist folder made when Node.js building
-COPY --from=build /app/dist /usr/share/nginx/html
-
-# apply Nginx config regarding React display
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-# container port
-EXPOSE 80
-
-CMD ["nginx", "-g", "daemon off;"]
+# 6. 외부(호스트) 접속 허용을 위한 --host 옵션과 함께 개발 서버 실행
+CMD ["npm", "run", "dev"]
