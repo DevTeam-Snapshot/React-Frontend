@@ -1,17 +1,23 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const Submit = function () {
-  // 폼 텍스트 필드들을 하나의 객체로 관리
   const [formData, setFormData] = useState({
-    AccomodationDesc: '',
-    AdDesc: '',
-    RefDesc: '',
+    hotel_description: '',
+    ad_copy: '',
+    additional_instructions: '',
   });
   const [image, setImage] = useState(null);
-  const [previewUrl, setPreviewUrl] = useState(null); // 업로드한 참고 이미지 미리보기
-  const [resultImage, setResultImage] = useState(null); // 서버가 생성해준 광고 이미지
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const [resultImage, setResultImage] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  // previewUrl이 바뀌거나 컴포넌트가 사라질 때, 이전 미리보기 URL을 정리
+  useEffect(() => {
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+    };
+  }, [previewUrl]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -31,27 +37,27 @@ const Submit = function () {
     setError(null);
 
     try {
-      // 텍스트 + 이미지를 같이 보내야 하므로 FormData 사용
       const payload = new FormData();
-      payload.append('accomodation_desc', formData.AccomodationDesc);
-      payload.append('ad_desc', formData.AdDesc);
-      payload.append('ref_desc', formData.RefDesc);
+      payload.append('hotel_description', formData.hotel_description);
+      payload.append('ad_copy', formData.ad_copy);
+      payload.append('additional_instructions', formData.additional_instructions);
       if (image) payload.append('image', image);
 
-      const response = await fetch('http://localhost:8000/api/image-generations', {
+      const response = await fetch('http://localhost:9000/api/image-generations', {
         method: 'POST',
         body: payload,
-        // FormData를 body로 넘길 땐 Content-Type 헤더를 직접 지정하지 마세요.
-        // 브라우저가 boundary까지 포함해서 자동으로 설정해줍니다.
       });
 
       if (!response.ok) {
         throw new Error(`서버 오류: ${response.status}`);
       }
 
-      const result = await response.json();
-      // 백엔드가 { image_url: "..." } 형태로 준다고 가정 — 실제 응답 스펙에 맞춰 조정하세요.
-      setResultImage(result.image_url);
+      // 서버가 이미지 바이너리만 단독으로 응답
+      const blob = await response.blob();
+      const imageUrl = URL.createObjectURL(blob);
+
+      if (resultImage) URL.revokeObjectURL(resultImage); // 이전 결과 메모리 정리
+      setResultImage(imageUrl);
     } catch (err) {
       console.error('요청 실패:', err);
       setError('광고 이미지 생성에 실패했어요. 잠시 후 다시 시도해주세요.');
@@ -77,39 +83,39 @@ const Submit = function () {
             <div className="col-lg-7">
               <form className="sf-form" onSubmit={handleSubmit} noValidate>
                 <div className="form-group">
-                  <label htmlFor="sfAccomodationDesc">숙소 이름이나 주소와 같은 정보를 작성해주세요</label>
+                  <label htmlFor="sfhotel_description">숙소 이름이나 주소와 같은 정보를 작성해주세요</label>
                   <textarea
                     className="form-control sf-input sf-textarea"
-                    id="sfAccomodationDesc"
-                    name="AccomodationDesc"
+                    id="sfhotel_description"
+                    name="hotel_description"
                     rows="5"
-                    value={formData.AccomodationDesc}
+                    value={formData.hotel_description}
                     onChange={handleChange}
                     placeholder={"광고 제작에 필요한 숙소의 이름이나 주소와 같은 정보를 작성해주세요 \n예: 펜션이름은 숲속펜션 "}
                   />
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="sfAdDesc">광고 제작에 필요한 문구를 작성해주세요</label>
+                  <label htmlFor="sfad_copy">광고 제작에 필요한 문구를 작성해주세요</label>
                   <textarea
                     className="form-control sf-input sf-textarea"
-                    id="sfAdDesc"
-                    name="AdDesc"
+                    id="sfad_copy"
+                    name="ad_copy"
                     rows="5"
-                    value={formData.AdDesc}
+                    value={formData.ad_copy}
                     onChange={handleChange}
                     placeholder={"광고 문구로 담고 싶은 내용을 자유롭게 적어주세요. \n예: 여름에도 시원한 우리 펜션으로 놀러오세요."}
                   />
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="sfRefDesc">광고 제작 시 추가로 참고해야할 내용을 작성해주세요</label>
+                  <label htmlFor="sfadditional_instructions">광고 제작 시 추가로 참고해야할 내용을 작성해주세요</label>
                   <textarea
                     className="form-control sf-input sf-textarea"
-                    id="sfRefDesc"
-                    name="RefDesc"
+                    id="sfadditional_instructions"
+                    name="additional_instructions"
                     rows="5"
-                    value={formData.RefDesc}
+                    value={formData.additional_instructions}
                     onChange={handleChange}
                     placeholder={"광고 이미지 제작에 필요한 추가 내용을 자유롭게 적어주세요. \n예: A4 크기의 광고페이지로 만들어주세요."}
                   />
