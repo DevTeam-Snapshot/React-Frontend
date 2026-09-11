@@ -5,7 +5,7 @@ const Header = function() {
         <header class="sf-header">
             <nav class="navbar navbar-expand-lg container sf-nav">
                 <a class="navbar-brand sf-brand" href="#top">
-                    스테이프레임<span class="sf-brand-dot">.</span>
+                    Snapshot!
                 </a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#sfNav" aria-controls="sfNav" aria-expanded="false" aria-label="메뉴 열기">
                     <span class="navbar-toggler-icon"></span>

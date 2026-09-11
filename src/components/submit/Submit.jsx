@@ -51,13 +51,13 @@ const Submit = function () {
       if (!response.ok) {
         throw new Error(`서버 오류: ${response.status}`);
       }
+      // blob이 아니라 JSON으로 응답옴
+      const data = await response.json();
+      // data 예시: { generated_image_url: "/static/images/xxxx.png", status: "..." }
+      const fullImageUrl = `http://localhost:9000${data.generated_image_url}`;
+      setResultImage(fullImageUrl);
 
-      // 서버가 이미지 바이너리만 단독으로 응답
-      const blob = await response.blob();
-      const imageUrl = URL.createObjectURL(blob);
-
-      if (resultImage) URL.revokeObjectURL(resultImage); // 이전 결과 메모리 정리
-      setResultImage(imageUrl);
+      setResultImage(fullImageUrl); // 그냥 URL 문자열 저장
     } catch (err) {
       console.error('요청 실패:', err);
       setError('광고 이미지 생성에 실패했어요. 잠시 후 다시 시도해주세요.');
