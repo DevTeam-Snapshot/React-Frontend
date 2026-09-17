@@ -77,13 +77,20 @@
   .hero-eyebrow{
     font-size:.82rem;
     font-weight:600;
-    color:var(--accent);
-    background:var(--accent-soft);
+    color:var(--ink);
+    background:linear-gradient(135deg, #f7ffc9 0%, #fbfb24 100%);
     border-radius:20px;
     padding:.4rem .9rem;
     display:inline-flex;
     align-items:center;
     gap:.4rem;
+  }
+  .hero-eyebrow i {
+    background: linear-gradient(135deg, #ff7a00, #a020f0);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent; /* 폴백 */
   }
   .hero-title{
     font-size:2.6rem;
@@ -106,7 +113,7 @@
     margin-top:1.9rem;
   }
   .btn-hero-primary{
-    background:var(--sage);
+    background:var(--ink);
     border:none;
     color:#fff;
     border-radius:12px;
@@ -152,7 +159,7 @@
     border-radius:20px;
     background:
       linear-gradient(#ffffff, #ffffff) padding-box,
-      linear-gradient(90deg, #ff8a5c 0%, #a855f7 100%) border-box;  }
+      linear-gradient(135deg, #ff8a5c 0%, #a855f7 100%) border-box;  }
   .hero-badge-float{
     position:absolute;
     top:1.4rem;
@@ -186,8 +193,8 @@
     display:inline-block;
     font-size:.72rem;
     font-weight:600;
-    color:var(--accent);
-    background:var(--accent-soft);
+    color:var(--ink);
+    background:var(--salgu);
     border-radius:20px;
     padding:.2rem .6rem;
     margin-bottom:.4rem;
@@ -215,10 +222,12 @@
   .mini-card-1{
     top:-0.9rem;
     left:-1.2rem;
+    border:2px solid #ff8a5c;
   }
   .mini-card-2{
     bottom:-1rem;
     right:-1.1rem;
+    border: 2px solid #a855f7;
   }
   .mini-card small{
     display:block;
@@ -232,7 +241,7 @@
   .section-label{
     font-size:.82rem;
     font-weight:600;
-    color:var(--accent);
+    color:var(--ink-soft);
     text-transform:uppercase;
     letter-spacing:.06em;
   }
@@ -263,8 +272,8 @@
   .step-mini-icon{
     width:42px;height:42px;
     border-radius:11px;
-    background:var(--sage-soft);
-    color:var(--sage);
+    background:var(--salgu);
+    color:var(--ink);
     font-size:1.15rem;
     margin-top:.6rem;
   }
@@ -330,19 +339,22 @@
     background:#fff;
     border: 2px solid transparent;
     border-radius: 18px;
-    padding:2rem 2rem 1.75rem;
+    padding:1rem 1rem 0.9rem;
 
     background:
       linear-gradient(#ffffff, #ffffff) padding-box,
       linear-gradient(90deg, #ff8a5c 0%, #a855f7 100%) border-box;
   }
+  .journey-panel > .mb-4 {
+  margin-bottom: 0.75rem !important; /* 기존 mb-4 = 1.5rem */
+  }
   .journey-title{
-    font-size:1.3rem;
+    font-size:1.05rem;
     font-weight:700;
     letter-spacing:-0.01em;
   }
   .journey-sub{
-    font-size:.85rem;
+    font-size:.78rem;
     color:var(--ink-soft);
   }
   .view-only-badge{
@@ -357,17 +369,18 @@
   .progress-counter{
     font-size:.88rem;
     font-weight:700;
-    color:var(--accent);
+    color:var(--ink);
   }
 
   .guide-card{
     background:#fff;
     border:1px solid var(--line);
     border-radius:14px;
-    padding:1.3rem 1.25rem;
+    padding:0.7rem 0.7rem;
     height:100%;
     position:relative;
     transition:border-color .15s ease, box-shadow .15s ease;
+    overflow: hidden; /* 물결이 카드 밖으로 안 나가게 */
   }
   .guide-num{
     font-size:.85rem;
@@ -380,48 +393,67 @@
     background:var(--sage-soft);
     color:var(--sage);
     font-size:1.2rem;
-    margin-top:.7rem;
+    margin-top:0.35rem;
   }
   .guide-title{
-    font-size:1rem;
+    font-size:0.85rem;
     font-weight:700;
-    margin-top:.9rem;
+    margin-top:0.4rem;
   }
   .guide-desc{
-    font-size:.82rem;
-    color:var(--ink-soft);
-    margin-top:.3rem;
-    line-height:1.5;
+    font-size:.72rem;
+    color:var(--ink);
+    margin-top:0.15rem;
+    line-height:1.35;
   }
-  .guide-status{
-    position:absolute;
-    top:1.1rem;
-    right:1.1rem;
-    font-size:1.05rem;
+  .guide-status {
+
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 2; /* 물결보다 위, 위치는 절대좌표 유지 */
+  }
+  .guide-status i {
+    background: linear-gradient(135deg, #fde047, #f59e0b);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
   }
   /* 진행 중: 강조 테두리 + 배경 */
-  .guide-card.active{
-    border:1.5px solid var(--accent);
-    background:var(--accent-soft);
-    box-shadow:0 6px 18px rgba(63,125,88,.12);
+  .guide-card.active {
+    border: 2px solid transparent;
+    background-image:
+      linear-gradient(#fef9c3, #fef9c3), /* ★ 카드 내부 배경을 병아리색으로 */
+      linear-gradient(135deg, #d4af37, #f9e79f, #d4af37);
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
   }
   .guide-card.active .guide-icon{
-    background:var(--sage);
+    background:#0d9488;
     color:#fff;
   }
   .guide-card.active .guide-num{
-    color:var(--accent);
+    color:#0d9488;
   }
   /* 완료: 은은한 체크 표시 */
+  .guide-card.done {
+    border: 2px solid transparent;
+    background-image:
+      linear-gradient(#fef9c3, #fef9c3), /* ★ 카드 내부 배경을 병아리색으로 */
+      linear-gradient(135deg, #d4af37, #f9e79f, #d4af37);
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+  }
   .guide-card.done .guide-icon{
-    background:var(--sage);
+    background:#0d9488;
     color:#fff;
   }
   .guide-card.done .guide-status{
-    color:var(--accent);
+    color:#0d9488;
   }
   .guide-card.done .guide-num{
-    color:var(--ink-faint);
+    color:#0d9488;
   }
   /* 대기: 기본값보다 살짝 흐리게 */
   .guide-card.pending{
@@ -444,10 +476,59 @@
   }
   .bot-avatar{
     width:40px;height:40px;border-radius:50%;
-    background:var(--sage);
+    background:linear-gradient(135deg, #ff6a00, #a020f0);
     color:#fff;
     font-size:1.1rem;
     flex-shrink:0;
+    position:relative; /* 가상요소 기준점 */
+  }
+
+  /* 최신 대화에만 붙는 클래스 */
+  .bot-avatar--active{
+    /* 실제 테두리 대신 padding + background-clip 트릭으로
+      회전하는 그라디언트 테두리를 표현 */
+    position:relative;
+    z-index:0;
+  }
+
+  .bot-avatar--active::before{
+    content:"";
+    position:absolute;
+    inset:-3px; /* 테두리 두께 */
+    border-radius:50%;
+    background:conic-gradient(
+      from 0deg,
+      #00e5ff, #a020f0, #ff6a00, #00e5ff
+    );
+    z-index:-1;
+    animation: spin-border 2.2s linear infinite;
+  }
+
+  .bot-avatar--active::after{
+    content:"";
+    position:absolute;
+    inset:-6px;
+    border-radius:50%;
+    box-shadow:0 0 8px 2px rgba(160,32,240,0.55);
+    animation: pulse-glow 1.6s ease-in-out infinite;
+    z-index:-2;
+  }
+
+  @keyframes spin-border{
+    to{ transform:rotate(360deg); }
+  }
+
+  @keyframes pulse-glow{
+    0%,100%{ opacity:0.5; transform:scale(1); }
+    50%{ opacity:1; transform:scale(1.08); }
+  }
+
+  /* 성능/접근성: 애니메이션 최소화 선호 시 */
+  @media (prefers-reduced-motion: reduce){
+    .bot-avatar--active::before,
+    .bot-avatar--active::after{
+      animation:none;
+    }
   }
   .bot-message{
     font-size:1rem;
@@ -504,7 +585,7 @@
   .send-btn{
     width:38px;height:38px;
     border-radius:10px;
-    background:var(--sage);
+    background:var(--ink);
     color:#fff;
     border:none;
     flex-shrink:0;
@@ -547,17 +628,17 @@
   .qa-num{
     font-size:.8rem;
     font-weight:700;
-    color:var(--ink-soft);
+    color:var(--ink);
   }
   .qa-label{
     font-size:.85rem;
     font-weight:600;
-    color:var(--ink-soft);
+    color:var(--ink);
   }
   .qa-answer-marker{
     font-size:1rem;
     font-weight:700;
-    color:var(--marker);
+    color:var(--ink-faint);
     position:relative;
     display:inline-block;
   }
@@ -632,7 +713,7 @@
     font-size:.72rem;
     font-weight:600;
     color:#fff;
-    background:var(--sage);
+    background:var(--ink);
     border-radius:20px;
     padding:.2rem .6rem;
   }
@@ -724,7 +805,7 @@
     padding:.6rem 1.1rem;
   }
   .btn-proceed{
-    background:var(--sage);
+    background:var(--ink);
     border:none;
     color:#fff;
     border-radius:10px;
@@ -736,3 +817,56 @@
     background:#243020;
     color:#fff;
   }
+.gradient-text {
+  background: linear-gradient(90deg, #ff7a00, #8b2fd4);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent; /* 폴백 */
+  display: inline-block; /* 일부 브라우저에서 클리핑 안정성 향상 */
+}
+/* 물결보다 위에 오도록 z-index만 부여 (position은 각자의 원래 방식 유지) */
+.guide-card > .guide-num,
+.guide-card > .guide-icon,
+.guide-card > .guide-title,
+.guide-card > .guide-desc {
+  position: relative;
+  z-index: 2;
+}
+
+.wave-layer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 200%;
+  height: 50%;
+  display: flex;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.wave-layer svg {
+  width: 50%;
+  height: 100%;
+  flex-shrink: 0;
+  opacity: 0.65;
+}
+
+.wave-layer--back {
+  animation: wave-move 4.5s linear infinite;
+}
+
+.wave-layer--front {
+  animation: wave-move 2.8s linear infinite;
+}
+
+@keyframes wave-move {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wave-layer {
+    animation: none;
+  }
+}

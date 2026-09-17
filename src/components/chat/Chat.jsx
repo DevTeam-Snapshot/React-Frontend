@@ -1,90 +1,118 @@
-const Chat = function() {
+import { useState, useRef, useEffect } from 'react';
+
+function markLatestBotAvatar() {
+  document.querySelectorAll('.bot-avatar--active')
+    .forEach(el => el.classList.remove('bot-avatar--active'));
+
+  const avatars = document.querySelectorAll('.bot-avatar');
+  const latest = avatars[avatars.length - 1];
+  if (latest) latest.classList.add('bot-avatar--active');
+}
+
+const Chat = function({activeStepIndex, onStepComplete}) {
+    const [messages, setMessages] = useState([
+        {
+        id: 1,
+        role: 'bot',
+        text: '안녕하세요!\n어떤 숙소의 광고를 만들어드릴까요?',
+        category: 'type'
+        },
+    ]);
+    const [input, setInput] = useState('');
+    const [isBotTyping, setIsBotTyping] = useState(false);
+
+    const addMessage = (role, text, category) => {
+        setMessages(prev => [
+        ...prev,
+        { id: Date.now() + Math.random(), role, text, category }
+        ]);
+    };
+
+    const handleSend = async () => {
+        if (!input.trim()) return;
+
+        addMessage('user', input);
+        const userText = input;
+        setInput('');
+        setIsBotTyping(true);
+        onStepComplete();
+
+        try {
+        const reply = await fetchBotReply(userText); // 백엔드/AI API 호출
+        addMessage('bot', reply);
+        } catch (err) {
+        addMessage('bot', '죄송해요, 응답 중 오류가 발생했어요.');
+        } finally {
+        setIsBotTyping(false);
+        }
+    };
+
+    const handleOptionClick = (optionLabel) => {
+        addMessage('user', optionLabel);
+        // 옵션 선택도 결국 "사용자가 말한 것"으로 취급해서 같은 흐름 태우기
+        handleBotResponseFor(optionLabel);
+    };
 
     return (
-        <>
-            {/* ============ 하단: AI 챗봇 대화 폼 ============ */}
-            <div className="chat-panel">
+        <div className="chat-panel">
+        <div className="chat-messages">
+            {messages.map((msg, i) => {
+            const isLastBot = msg.role === 'bot' &&
+                i === messages.map(m => m.role).lastIndexOf('bot');
 
-                <div className="d-flex align-items-start gap-3 mb-4">
-                <div className="bot-avatar d-flex align-items-center justify-content-center">
+            return (
+                <div key={msg.id} className="d-flex align-items-start gap-3 mb-4">
+                {msg.role === 'bot' && (
+                    <div className={`bot-avatar d-flex align-items-center justify-content-center ${isLastBot ? 'bot-avatar--active' : ''}`}>
                     <i className="bi bi-robot"></i>
+                    </div>
+                )}
+                <div className={msg.role === 'bot' ? 'bot-message pt-1' : 'user-message pt-1'}>
+                    {msg.text}
                 </div>
-                <div className="bot-message pt-1">
-                    안녕하세요!<br/>어떤 숙소의 광고를 만들어드릴까요?
                 </div>
-                </div>
+            );
+            })}
 
-                {/* 빠른 선택 옵션 (실제로는 Step 1 답변 입력 역할) */}
-                <div className="row g-2 mb-3">
-                <div className="col-6 col-md-3">
-                    <button className="option-card d-flex align-items-center gap-2">
-                    <div className="option-icon d-flex align-items-center justify-content-center">
-                        <i className="bi bi-building"></i>
-                    </div>
-                    <div>
-                        <div className="option-title">호텔</div>
-                        <div className="option-desc">세련된 휴식, 특별한 경험</div>
-                    </div>
-                    </button>
+            {isBotTyping && (
+            <div className="d-flex align-items-start gap-3 mb-4">
+                <div className="bot-avatar bot-avatar--active d-flex align-items-center justify-content-center">
+                <i className="bi bi-robot"></i>
                 </div>
-                <div className="col-6 col-md-3">
-                    <button className="option-card d-flex align-items-center gap-2">
-                    <div className="option-icon d-flex align-items-center justify-content-center">
-                        <i className="bi bi-signpost-split"></i>
-                    </div>
-                    <div>
-                        <div className="option-title">모텔</div>
-                        <div className="option-desc">편안한 휴식, 실용적인 선택</div>
-                    </div>
-                    </button>
-                </div>
-                <div className="col-6 col-md-3">
-                    <button className="option-card d-flex align-items-center gap-2">
-                    <div className="option-icon d-flex align-items-center justify-content-center">
-                        <i className="bi bi-tree"></i>
-                    </div>
-                    <div>
-                        <div className="option-title">리조트</div>
-                        <div className="option-desc">여유로운 시간, 특별한 추억</div>
-                    </div>
-                    </button>
-                </div>
-                <div className="col-6 col-md-3">
-                    <button className="option-card d-flex align-items-center gap-2">
-                    <div className="option-icon d-flex align-items-center justify-content-center">
-                        <i className="bi bi-house-door"></i>
-                    </div>
-                    <div>
-                        <div className="option-title">펜션</div>
-                        <div className="option-desc">자연 속의 하루, 소중한 사람들</div>
-                    </div>
-                    </button>
-                </div>
-                </div>
+                <div className="bot-message pt-1 typing-indicator">...</div>
+            </div>
+            )}
+        </div>
 
-                {/* 실제 입력창 */}
-                <div className="chat-input-row d-flex align-items-center px-3 py-2 gap-2 mb-2">
-                <i className="bi bi-paperclip attach-icon"></i>
-                <input type="text" className="form-control flex-grow-1" placeholder="예: 바다가 보이는 펜션 광고를 만들고 싶어요"/>
-                <button className="send-btn d-flex align-items-center justify-content-center">
-                    <i className="bi bi-send-fill" style={{fontSize:".85rem"}}></i>
+        {/* 옵션 카드는 대화 시작 전(메시지가 1개뿐일 때)에만 보여주는 게 자연스러움 */}
+        {messages.length === 1 && (
+            <div className="row g-2 mb-3">
+            {['호텔', '모텔', '리조트', '펜션'].map(opt => (
+                <div className="col-6 col-md-3" key={opt}>
+                <button className="option-card" onClick={() => handleOptionClick(opt)}>
+                    {opt}
                 </button>
                 </div>
-
-                <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
-                <span className="footer-hint d-flex align-items-center gap-1">
-                    <i className="bi bi-info-circle"></i> 선택하거나 직접 이야기해주세요.
-                </span>
-                <span className="footer-brand-note">
-                    당신의 숙소가 더 많은 사람들에게 알려지도록<br/>
-                    <em>Snapshot</em>
-                </span>
-                </div>
-
+            ))}
             </div>
+        )}
 
-        </>
-    )
-}
+        {/* 입력창 */}
+        <div className="chat-input-row d-flex align-items-center px-3 py-2 gap-2 mb-2">
+            <input
+            type="text"
+            className="form-control flex-grow-1"
+            value={input}
+            onChange={e => setInput(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && handleSend()}
+            placeholder="예: 바다가 보이는 펜션 광고를 만들고 싶어요"
+            />
+            <button className="send-btn" onClick={handleSend}>
+            <i className="bi bi-send-fill"></i>
+            </button>
+        </div>
+        </div>
+    );
+};
 
 export default Chat;

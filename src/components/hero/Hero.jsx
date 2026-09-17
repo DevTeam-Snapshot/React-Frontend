@@ -12,7 +12,7 @@ const Hero = function(){
                                 <i className="bi bi-stars"></i> AI와 대화 한 번으로 완성
                             </span>
                             <h1 className="hero-title">우리 숙소만의 이야기를,<br/>
-                                <span className="accent-text">멋진 광고</span>로 만들어보세요
+                                <span className="gradient-text">멋진 광고</span>로 만들어보세요
                             </h1>
                             <p className="hero-desc">
                             숙소 이름과 사진 몇 장이면 충분해요. Snapshot의 AI 광고 플래너가
@@ -36,12 +36,9 @@ const Hero = function(){
                         <div className="col-lg-6">
                             <div className="hero-visual">
                                 <div className="hero-visual-bg"></div>
-                                <div className="hero-badge-float d-none d-md-flex align-items-center gap-1">
-                                    <i className="bi bi-eye"></i> 실시간으로 함께 완성돼요
-                                </div>
 
                                 <div className="hero-photo-card">
-                                    <img src="https://placehold.co/640x440/3f4a3a/ffffff?text=Seoul+Hotel" alt="숙소 광고 예시"/>
+                                    <img src="../../../viewdesign/NamsanHotel.png" alt="숙소 광고 예시"/>
                                     <div className="hero-photo-caption">
                                         <span className="hero-photo-tag">B안 · 감성 중심</span>
                                         <div className="hero-photo-title">도심 위, 둘만의 특별한 하루</div>
@@ -51,14 +48,14 @@ const Hero = function(){
 
                                 <div className="mini-card mini-card-1">
                                     <div className="d-flex align-items-center gap-2">
-                                        <i className="bi bi-robot" style={{color:"var(--sage)"}}></i> 남산뷰 객실 · 루프탑
+                                        <i className="bi bi-robot" style={{color:"#fe4a03"}}></i> 남산뷰 객실 · 루프탑
                                     </div>
                                     <small>강조하고 싶은 매력으로 등록됨</small>
                                 </div>
 
                                 <div className="mini-card mini-card-2">
                                     <div className="d-flex align-items-center gap-2">
-                                        <i className="bi bi-check2-circle" style={{color:"var(--accent)"}}></i> 6 / 6 완료
+                                        <i className="bi bi-check2-circle" style={{color:"#8204f8"}}></i> 6 / 6 완료
                                     </div>
                                     <small>광고 초안 3종 생성 완료</small>
                                 </div>
