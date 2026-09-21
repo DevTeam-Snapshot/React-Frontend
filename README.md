@@ -30,7 +30,7 @@ Frontend는 PostgreSQL이나 vLLM에 직접 접속하지 않습니다. 두 서�
 - React
 - Vite
 
-## 로컬 개발 실행
+## 로컬 개발 실행(단독 서버 실행)
 
 환경 변수 파일을 준비합니다.
 
@@ -48,7 +48,7 @@ VITE_API_BASE_URL=http://localhost:9000
 
 ```bash
 npm install
-npm run dev
+npm run dev -- --port 3000
 ```
 
 브라우저에서 다음 주소로 접속합니다.
