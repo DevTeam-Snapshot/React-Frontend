@@ -1,11 +1,33 @@
-// 버튼 클릭시 페이지 이동
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const Howitworks = function() {
     const navigate = useNavigate();
+    const [isLoading, setIsLoading] = useState(false);
 
-    const handleStart = () => {
-        navigate("/makingads", { state: { fromButton: true } });
+    const handleStart = async () => {
+        if (isLoading) return; // 중복 클릭 방지
+        setIsLoading(true);
+
+        try {
+            const res = await fetch("/api/planning-sessions", {
+                method: "POST",
+            });
+
+            if (!res.ok) {
+                throw new Error(`세션 생성 실패 (${res.status})`);
+            }
+
+            const session = await res.json(); // 201 Created, { id, status, ... }
+
+            navigate("/makingads", {
+                state: { fromButton: true, sessionId: session.id },
+            });
+        } catch (err) {
+            console.error(err);
+            alert("광고 기획을 시작하지 못했어요. 잠시 후 다시 시도해주세요.");
+            setIsLoading(false); // 실패했을 때만 버튼 복구 (성공하면 페이지가 넘어감)
+        }
     };
 
     return(
@@ -85,9 +107,13 @@ const Howitworks = function() {
             </section>
             <section className="container pb-5">
                 <div className="text-center">
-                    <button className="btn-cta-white d-inline-flex align-items-center gap-2"
-                    onClick={handleStart}>
-                        광고 제작 시작하기 <i className="bi bi-arrow-right"></i>
+                    <button
+                        className="btn-cta-white d-inline-flex align-items-center gap-2"
+                        onClick={handleStart}
+                        disabled={isLoading}
+                    >
+                        {isLoading ? "준비 중..." : "광고 제작 시작하기"}
+                        {!isLoading && <i className="bi bi-arrow-right"></i>}
                     </button>
                 </div>
             </section>
