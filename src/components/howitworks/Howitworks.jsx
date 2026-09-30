@@ -1,34 +1,8 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import useStartAd from "../../assets/utils/useStartAd";
 
 const Howitworks = function() {
-    const navigate = useNavigate();
-    const [isLoading, setIsLoading] = useState(false);
 
-    const handleStart = async () => {
-        if (isLoading) return; // 중복 클릭 방지
-        setIsLoading(true);
-
-        try {
-            const res = await fetch("/api/planning-sessions", {
-                method: "POST",
-            });
-
-            if (!res.ok) {
-                throw new Error(`세션 생성 실패 (${res.status})`);
-            }
-
-            const session = await res.json(); // 201 Created, { id, status, ... }
-
-            navigate("/makingads", {
-                state: { fromButton: true, sessionId: session.id },
-            });
-        } catch (err) {
-            console.error(err);
-            alert("광고 기획을 시작하지 못했어요. 잠시 후 다시 시도해주세요.");
-            setIsLoading(false); // 실패했을 때만 버튼 복구 (성공하면 페이지가 넘어감)
-        }
-    };
+    const { handleStart, isLoading } = useStartAd();
 
     return(
         <>

@@ -13,6 +13,10 @@ export default defineConfig({
         target: process.env.VITE_API_TARGET || 'http://127.0.0.1:9000',
         changeOrigin: true,
       },
+      '/images': {                          // ✅ 추가
+        target: process.env.VITE_API_TARGET || 'http://127.0.0.1:9000',
+        changeOrigin: true,
+      },
     },
   },
 })

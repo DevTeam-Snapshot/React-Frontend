@@ -9,7 +9,6 @@ const Topbar = function() {
                 <span className="brand-sub d-none d-sm-inline">숙소의 매력을 광고로</span>
             </div>
             <div className="d-flex align-items-center gap-2">
-                <button className="btn-ghost">로그인</button>
                 <button className="btn-primary-sage">무료로 시작하기</button>
             </div>
         </nav>

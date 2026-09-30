@@ -1,31 +1,33 @@
 import Topbar from '../components/topbar/Topbar';
-import Guide, {STEPS} from '../components/guide/Guide';
+import Guide from '../components/guide/Guide';
 import Chat from '../components/chat/Chat';
 
-import { useLocation, Navigate } from "react-router-dom";
-import { useState } from "react";
+import { useParams } from "react-router-dom";
+import { usePlanningProgress } from '../assets/utils/usePlanningProgress';
+import { computeActiveStepIndex } from '../assets/utils/planningSteps';
 
 function MakingAds() {
-    const location = useLocation();
+  const { sessionId } = useParams(); // ✅ URL 파라미터에서 실제 세션 ID 추출
 
-    // state.fromButton이 없으면 = 버튼을 안 거치고 온 것 = 홈으로 되돌림
-    if (!location.state?.fromButton) {
-        return <Navigate to="/" replace />;
-    }
+  const { planning } = usePlanningProgress(sessionId);
 
-    const [activeStepIndex, setActiveStepIndex] = useState(0);
+  const activeStepIndex = computeActiveStepIndex(
+    planning?.current_step,
+    planning?.is_complete ?? false
+  );
 
-	return (
-		<>
-        	<Topbar />
-            <div className="container-fluid px-4 py-4" style={{maxWidth:"1280px", margin:"0 auto", background:"linear-gradient(180deg, #fdf1ea 0%, #f7eef4 100%)"}}>
-                <Guide activeStepIndex={activeStepIndex} />
-                <Chat
-                    activeStepIndex={activeStepIndex}
-                    onStepComplete={() => setActiveStepIndex(prev => Math.min(prev + 1, STEPS.length - 1))}/>            
-            </div>
-		</>
-	);
+  return (
+    <>
+      <Topbar />
+      <div
+        className="container-fluid px-4 py-4"
+        style={{ maxWidth: "1280px", margin: "0 auto", background: "linear-gradient(180deg, #fdf1ea 0%, #f7eef4 100%)" }}
+      >
+        <Guide activeStepIndex={activeStepIndex} />
+        <Chat sessionId={sessionId} activeStepIndex={activeStepIndex} />
+      </div>
+    </>
+  );
 }
 
 export default MakingAds;

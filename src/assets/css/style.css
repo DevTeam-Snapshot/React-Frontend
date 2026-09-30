@@ -621,7 +621,7 @@
     color:var(--ink-soft);
   }
   .side-desc{
-    font-size:.82rem;
+    font-size:.78rem;
     color:var(--ink-soft);
     line-height:1.5;
   }
@@ -636,8 +636,9 @@
     color:var(--ink);
   }
   .qa-answer-marker{
-    font-size:1rem;
+    font-size:0.9rem;
     font-weight:700;
+    line-height:1.4;
     color:var(--ink-faint);
     position:relative;
     display:inline-block;
@@ -652,7 +653,7 @@
     border-radius:2px;
   }
   .qa-item{
-    padding:.85rem 0;
+    padding:.4rem 0;
     border-bottom:1px dashed var(--line);
   }
   .qa-item:last-of-type{
@@ -689,26 +690,51 @@
     overflow:hidden;
     cursor:pointer;
     transition: transform 0.25s ease, box-shadow 0.25s ease;
+    padding: 12px;
   }
   .draft-card:hover{
     transform: translateY(-10px);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
   }
-  .draft-card.selected{
+  .draft-card--selected{
     background:
-      linear-gradient(#ffffff, #ffffff) padding-box,
+      linear-gradient(#faf5ff, #faf5ff) padding-box,        /* 안쪽을 연보라로 */
       linear-gradient(90deg, #ff8a5c 0%, #a855f7 100%) border-box;
-    border:2px solid transparent;
-
-    box-shadow:0 4px 18px rgba(47,59,42,.12);
+    border:3px solid transparent;                           /* 테두리 2px → 3px */
+    box-shadow:0 0 0 4px rgba(168, 85, 247, .18);           /* 보라색 글로우 */
   }
   .draft-card-head{
-    padding:.85rem 1rem .6rem;
+    padding:0 0 .6rem;
+  }
+  .draft-image {
+    display: block;
+    width: 100%;                      /* 카드 폭에 맞춤 → 옆으로 넘치지 않음 */
+    aspect-ratio: 4 / 5;              /* 백엔드 이미지 비율과 동일 */
+    max-height: calc(100vh - 340px);  /* 화면 높이를 넘지 않게 제한 */
+    object-fit: contain;              /* 절대 자르지 않음 */
+    border-radius: 10px;
+  }
+
+  .draft-error {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      aspect-ratio: 4 / 5;              /* 실패 카드도 같은 크기로 자리 유지 */
+      max-height: calc(100vh - 340px);
+      background: #f5f5f5;
+      border-radius: 10px;
+      color: #999;
   }
   .draft-option-label{
     font-size:.92rem;
     font-weight:700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;          /* flex 안에서 말줄임이 동작하려면 필요 */
   }
+
   .selected-badge{
     font-size:.72rem;
     font-weight:600;
@@ -716,6 +742,8 @@
     background:var(--ink);
     border-radius:20px;
     padding:.2rem .6rem;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
   .form-check-input:checked{
     background-color:var(--sage);
@@ -789,12 +817,13 @@
     font-size:.82rem;
     color:var(--ink-soft);
     text-align:center;
-    padding:.75rem 0;
+    padding:.6rem 0 0;
   }
 
   .footer-note{
     font-size:.82rem;
     color:var(--ink-soft);
+    min-width: 0;
   }
   .btn-regenerate{
     border:1px solid var(--line);
@@ -803,6 +832,8 @@
     font-size:.88rem;
     font-weight:600;
     padding:.6rem 1.1rem;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
   .btn-proceed{
     background:var(--ink);
@@ -812,6 +843,8 @@
     font-size:.9rem;
     font-weight:700;
     padding:.65rem 1.3rem;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
   .btn-proceed:hover{
     background:#243020;
@@ -870,3 +903,138 @@
     animation: none;
   }
 }
+
+.chat-image-preview img {
+    display: block;
+    width: 180px;
+    height: 130px;
+    object-fit: cover;          /* 비율 유지하며 잘라서 채움 */
+    border-radius: 12px;
+    border: 1px solid #eee;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    cursor: zoom-in;
+    transition: transform 0.15s ease;
+}
+
+.chat-image-preview img:hover {
+    transform: scale(1.03);
+}
+
+@media (max-width: 576px) {
+    .chat-image-preview img { width: 140px; height: 100px; }
+}
+
+/* 추가: 버튼 비활성 상태 */
+.btn-proceed:disabled{
+  background:var(--ink-faint);
+  cursor:not-allowed;
+}
+
+/* 추가: 라디오 크기 */
+.draft-card .form-check-input{
+  width:1.15rem;
+  height:1.15rem;
+  cursor:pointer;
+}
+
+/* ============ 추가: 오른쪽 선택 영역 sticky ============ */
+.select-col{
+  position: sticky;
+  top: 1rem;               /* 상단 고정 헤더가 있다면 그 높이 + 여유만큼 */
+  align-self: flex-start;  /* row의 stretch를 끊어야 sticky가 동작 */
+}
+
+/* 모바일(1열 배치)에서는 고정 해제 */
+@media (max-width: 991px){
+  .select-col{
+    position: static;
+  }
+}
+
+/* ============ 추가: 기획서 긴 답변 접기 ============ */
+.qa-answer-marker.is-clamped{
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.qa-more{
+  display: block;
+  margin-top: .2rem;
+  padding: 0;
+  border: none;
+  background: none;
+  font-size: .75rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+.qa-more:hover{
+  color: var(--ink);
+}
+.qa-more:focus-visible{
+  outline: 2px solid #a855f7;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ============ 추가: 로딩 상태 (Windows 11 스타일 점 회전) ============ */
+.loading-state{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 4rem 1rem;
+}
+.loading-title{
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 1.5rem 0 .35rem;
+}
+.loading-sub{
+  font-size: .85rem;
+  color: var(--ink-soft);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Windows 11(Fluent) ProgressRing: 끊긴 원호가 회전하며 길어졌다 짧아짐 */
+.win-ring{
+  width: 56px;
+  height: 56px;
+  animation: win-ring-rotate 2s linear infinite;
+}
+.win-ring__arc{
+  fill: none;
+  stroke: url(#winRingGradient);   /* 단색을 원하면 stroke: #a855f7; */
+  stroke-width: 4;
+  stroke-linecap: round;           /* 원호 끝을 둥글게 */
+  stroke-dasharray: 1 100;
+  stroke-dashoffset: 0;
+  transform-origin: center;
+  animation: win-ring-dash 1.6s ease-in-out infinite;
+}
+
+@keyframes win-ring-rotate{
+  to { transform: rotate(360deg); }
+}
+/* pathLength=100 기준: 짧은 점 → 3/4 원호로 늘어남 → 앞쪽이 따라잡으며 짧아짐 */
+@keyframes win-ring-dash{
+  0%   { stroke-dasharray: 1 100;  stroke-dashoffset: 0; }
+  50%  { stroke-dasharray: 70 100; stroke-dashoffset: -15; }
+  100% { stroke-dasharray: 70 100; stroke-dashoffset: -99; }
+}
+
+/* 모션 최소화 설정 사용자: 원호 길이는 고정, 천천히 회전만 */
+@media (prefers-reduced-motion: reduce){
+  .win-ring{ animation-duration: 4s; }
+  .win-ring__arc{
+    animation: none;
+    stroke-dasharray: 60 100;
+  }
+}
+

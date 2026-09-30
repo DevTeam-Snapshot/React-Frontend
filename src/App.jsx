@@ -21,8 +21,8 @@ const App = function() {
     <>
       <Routes>
         <Route path="/" element={<Mainpage/>}/>
-        <Route path="/makingads" element={<MakingAds/>}/>
-        <Route path="/selectad" element={<SelectAd/>}/>
+        <Route path="/makingads/:sessionId" element={<MakingAds />} />
+        <Route path="/selectad/:sessionId" element={<SelectAd/>}/>      
       </Routes>
     </>
   );

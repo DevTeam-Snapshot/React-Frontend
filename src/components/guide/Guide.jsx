@@ -1,13 +1,5 @@
 import WaveEffect from './WaveEffect';
-
-export const STEPS = [
-    { num: '01', icon: 'bi-building',    title: '숙소 유형', desc: '어떤 유형의 숙소인가요?' },
-    { num: '02', icon: 'bi-geo-alt',     title: '숙소 정보', desc: '이름, 위치, 주요 특징은?' },
-    { num: '03', icon: 'bi-award',       title: '강조할 매력', desc: '가장 자랑하고 싶은 점은?' },
-    { num: '04', icon: 'bi-people',      title: '광고 대상', desc: '어떤 분들에게 알리고 싶나요?' },
-    { num: '05', icon: 'bi-palette',     title: '분위기',   desc: '어떤 분위기를 원하시나요?' },
-    { num: '06', icon: 'bi-chat-quote',  title: '광고 문구', desc: '어떤 메시지를 담고 싶나요?' },
-];
+import { STEPS } from '../../assets/utils/planningSteps';
 
 function Guide({ activeStepIndex = 0 }) {
   return (

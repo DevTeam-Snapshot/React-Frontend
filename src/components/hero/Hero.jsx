@@ -1,9 +1,13 @@
+import useStartAd from "../../assets/utils/useStartAd";
+
 const Hero = function(){
+    const { handleStart, isLoading } = useStartAd();
+
     return(
         <>
             {/* ============ HERO ============ */}
             <section className="hero">
-                <div className="container" sylte={{background:"linear-gradient(135deg, #fef6f0 0%, #f9ede3 50%, #fbeae0 100%)"}}>
+                <div className="container" style={{background:"linear-gradient(135deg, #fef6f0 0%, #f9ede3 50%, #fbeae0 100%)"}}>
                     <div className="row align-items-center g-5">
 
                         {/* 좌측: 헤드라인 */}
@@ -19,11 +23,13 @@ const Hero = function(){
                             질문 몇 가지로 당신의 숙소를 가장 매력적으로 보여줄 광고를 함께 완성합니다.
                             </p>
                             <div className="hero-cta-row d-flex flex-wrap gap-2">
-                                <button className="btn-hero-primary d-flex align-items-center gap-2">
-                                    지금 광고 만들어보기 <i className="bi bi-arrow-right"></i>
-                                </button>
-                                <button className="btn-hero-secondary d-flex align-items-center gap-2">
-                                    <i className="bi bi-play-circle"></i> 예시로 보기
+                                <button
+                                    className="btn-hero-primary d-flex align-items-center gap-2"
+                                    onClick={handleStart}
+                                    disabled={isLoading}
+                                >
+                                    {isLoading ? "준비 중..." : "지금 광고 만들어보기"}
+                                    {!isLoading && <i className="bi bi-arrow-right"></i>}
                                 </button>
                             </div>
                             <p className="hero-meta">
