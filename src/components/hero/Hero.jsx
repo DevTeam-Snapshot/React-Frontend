@@ -1,4 +1,5 @@
 import useStartAd from "../../assets/utils/useStartAd";
+import exampleImg from "../../assets/examples/example.png"; // ✅ 추가
 
 const Hero = function(){
     const { handleStart, isLoading } = useStartAd();
@@ -44,7 +45,7 @@ const Hero = function(){
                                 <div className="hero-visual-bg"></div>
 
                                 <div className="hero-photo-card">
-                                    <img src="../../../viewdesign/NamsanHotel.png" alt="숙소 광고 예시"/>
+                                    <img src={exampleImg} alt="숙소 광고 예시"/>
                                     <div className="hero-photo-caption">
                                         <span className="hero-photo-tag">B안 · 감성 중심</span>
                                         <div className="hero-photo-title">도심 위, 둘만의 특별한 하루</div>

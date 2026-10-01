@@ -14,18 +14,60 @@ const STEP_KEYS = [
 ];
 
 const STEP_PLACEHOLDERS = {
-    lodging_type:        '예: 한옥 스테이, 글램핑',
-    lodging_type_detail: '예: 오션뷰 독채 펜션, 비즈니스 호텔',
-    lodging_name:        '예: 코드잇 모텔',
-    lodging_information: '예: 코드잇 모텔, 서울 마포구 합정동',
-    lodging_service:     '예: 무료 조식, 주차 가능, 반려동물 동반',
-    location:            '예: 서울 마포구 합정동',
-    selling_points:      '예: 한강이 보이는 객실, 무료 조식',
-    target_audience:     '예: 20~30대 커플, 가족 여행객',
+    lodging_type:        '예: 잠시 기다려 주세요...',
+    lodging_type_detail: '예: 오션뷰 독채 민박집, 유스호스텔, 게스트하우스',
+    // ✅ 변경: 이름과 위치를 한 번에 묻는 단계이므로 두 예시를 합침
+    lodging_information: '예: 코드잇 모텔, 코드잇 리조트',
+    lodging_name:        '예: 코드잇 모텔, 코드잇 리조트',
+    location:            '예: 서울 마포구 합정동, 성남시 분당구',
+    selling_points:      '예: 한강이 보이는 객실, 아늑하고 편안한 객실',
+    lodging_service:     '예: 무료 조식, 주차 가능, 반려동물 동반가능',
     mood:                '예: 따뜻하고 아늑한, 세련된 도시 감성',
-    color_preference:    '예: 네이비와 골드, 부드러운 파스텔톤',
-    ad_copy:             '예: 도심 속 나만의 휴식처',
+    color_preference:    '예: 네이비와 골드, 부드러운 파스텔톤, 차가운 쿨톤의 색상',
+    target_audience:     '예: 20~30대 커플, 가족 여행객',
+    ad_copy:             '예: 도심 속 나만의 휴식처 코드잇 호텔로 오세요',
 };
+
+// ✅ 명세의 진행 순서와 동일하게
+// lodging_type → lodging_information(name, location) → selling_points → lodging_service
+// → mood → color_preference → target_audience → ad_copy
+const FIELD_ORDER = [
+    'lodging_type',
+    'lodging_type_detail',
+    'lodging_name',
+    'location',
+    'selling_points',
+    'lodging_service',
+    'mood',
+    'color_preference',
+    'target_audience',
+    'ad_copy',
+];
+
+// 선택 필드: 서버가 missing_fields로 요구할 때만 순서에 포함
+const OPTIONAL_FIELDS = ['lodging_type_detail'];
+
+function isFilled(value) {
+    if (value == null) return false;
+    if (typeof value === 'string') return value.trim() !== '';
+    if (Array.isArray(value)) return value.length > 0;
+    if (typeof value === 'object') return Object.keys(value).length > 0;
+    return true;
+}
+
+function getPlaceholder(brief, missingFields = []) {
+    const nextField = FIELD_ORDER.find(key => {
+        if (OPTIONAL_FIELDS.includes(key) && !missingFields.includes(key)) return false;
+        return !isFilled(brief?.[key]);
+    });
+
+    // 이름과 위치가 둘 다 비어 있으면 합친 예시를 보여줌
+    if (nextField === 'lodging_name' && !isFilled(brief?.location)) {
+        return STEP_PLACEHOLDERS.lodging_information;
+    }
+
+    return STEP_PLACEHOLDERS[nextField] ?? '메시지를 입력해주세요';
+}
 
 const Chat = function({sessionId, activeStepIndex, onStepComplete}) {
 
@@ -175,10 +217,7 @@ const Chat = function({sessionId, activeStepIndex, onStepComplete}) {
     const isInputLocked = isAwaitingImage || isComplete;
     const isChoosingType = messages.length === 1;
 
-    const placeholder =
-    STEP_PLACEHOLDERS[planning?.current_step] ??
-    STEP_PLACEHOLDERS[planning?.missing_fields?.find(f => f in STEP_PLACEHOLDERS)] ??
-    '메시지를 입력해주세요';
+    const placeholder = getPlaceholder(planning?.brief, planning?.missing_fields);
 
     const [isSubmittingFinal, setIsSubmittingFinal] = useState(false);
 

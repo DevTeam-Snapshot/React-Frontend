@@ -178,12 +178,16 @@
     border-radius:16px;
     overflow:hidden;
     box-shadow:0 16px 40px rgba(34,38,31,.12);
+    max-width: 380px;   /* 380 × 1.25 = 이미지 높이 약 475px */
+    margin: 0 auto;     /* 오른쪽 칸 안에서 가운데 정렬 */
+
   }
-  .hero-photo-card img{
-    width:100%;
-    display:block;
-    aspect-ratio:16/11;
-    object-fit:cover;
+  .hero-photo-card img {
+    display: block;
+    width: 100%;
+    height: auto;              /* ❌ 고정 height(예: 400px) 제거 */
+    aspect-ratio: 1080 / 1350; /* 4:5 비율 유지 */
+    object-fit: cover;         /* 비율이 정확히 같으므로 잘리지 않음 */
   }
   .hero-photo-caption{
     background:#fff;
@@ -713,6 +717,7 @@
     max-height: calc(100vh - 340px);  /* 화면 높이를 넘지 않게 제한 */
     object-fit: contain;              /* 절대 자르지 않음 */
     border-radius: 10px;
+    cursor: zoom-in;
   }
 
   .draft-error {
@@ -1038,3 +1043,21 @@
   }
 }
 
+.protected-img {
+    -webkit-user-drag: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+}
+.preview-image {
+    display: block;
+    width: min(
+        calc(100vw - 32px),
+        calc((100dvh - 32px) * 0.8),
+        1080px
+    );
+    height: auto;
+    aspect-ratio: 1080 / 1350;
+    border-radius: 16px;
+    margin: 0 auto;
+}

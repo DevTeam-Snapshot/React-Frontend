@@ -1,6 +1,7 @@
-import { useState, useEffect, useRef } from "react";
-import { generateDrafts, regenerateDrafts } from "../../assets/utils/imageApi";
+import { generateDrafts, regenerateDrafts, downloadDraft } from "../../assets/utils/imageApi";
+import { useState, useEffect, useRef, useCallback } from "react";
 
+import Modal from "./Modal";
 const DIRECTION_LABELS = {
     room: "공간 중심",
     emotion: "감성 중심",
@@ -50,6 +51,13 @@ const SelectImg = function({ sessionId }) {
     const [isRegenerating, setIsRegenerating] = useState(false);
     const [regenError, setRegenError] = useState(null);
 
+    const [isDownloading, setIsDownloading] = useState(false);
+    const [downloadError, setDownloadError] = useState(null);
+
+    const [previewId, setPreviewId] = useState(null);
+    const closePreview = useCallback(() => setPreviewId(null), []);
+
+
     const hasRequestedRef = useRef(false);
 
     useEffect(() => {
@@ -87,11 +95,14 @@ const SelectImg = function({ sessionId }) {
 
         setIsRegenerating(true);
         setRegenError(null);
+        setPreviewId(null);
+
         try {
             const data = await regenerateDrafts(sessionId);
             setDrafts(data.drafts ?? []);
             setRegenerationUsed(Boolean(data.regeneration_used ?? true));
             setSelectedId(null); // 새 초안은 id가 바뀌므로 선택 초기화
+            setDownloadError(null);
         } catch (err) {
             // 이미 사용한 경우(서버가 409 등으로 거절) 버튼도 잠금
             if (err.status === 409) setRegenerationUsed(true);
@@ -99,6 +110,26 @@ const SelectImg = function({ sessionId }) {
             // 실패 시 기존 초안은 그대로 유지
         } finally {
             setIsRegenerating(false);
+        }
+    }
+
+    async function handleDownload() {
+        if (!selectedId || isDownloading) return;
+
+        const selected = drafts.find(d => d.id === selectedId);
+        if (!selected || selected.status !== 'completed') {
+            setDownloadError('생성이 완료된 초안만 다운로드할 수 있어요.');
+            return;
+        }
+
+        setIsDownloading(true);
+        setDownloadError(null);
+        try {
+            await downloadDraft(selectedId);
+        } catch (err) {
+            setDownloadError(err.message);
+        } finally {
+            setIsDownloading(false);
         }
     }
 
@@ -120,6 +151,14 @@ const SelectImg = function({ sessionId }) {
     const selectedIndex = drafts.findIndex(d => d.id === selectedId);
     const selectedLetter = selectedIndex >= 0 ? String.fromCharCode(65 + selectedIndex) : null;
 
+    // ✅ 추가: 미리보기 대상 계산
+    const previewIndex = drafts.findIndex(d => d.id === previewId);
+    const previewDraft = previewIndex >= 0 ? drafts[previewIndex] : null;
+    const previewLabel = previewDraft
+        ? (DIRECTION_LABELS[previewDraft.direction] ?? previewDraft.direction)
+        : "";
+
+
     return (
         <div className="col-lg-9 select-col">
             <div className="side-panel d-flex flex-column p-4">
@@ -137,7 +176,8 @@ const SelectImg = function({ sessionId }) {
 
                         return (
                             <div className="col-md-4" key={draft.id}>
-                                <label className={`draft-card d-block ${isSelected ? 'draft-card--selected' : ''}`}>
+                                <label     className={`draft-card d-block ${isSelected ? 'draft-card--selected' : ''}`}
+                                    onContextMenu={e => e.preventDefault()}>
                                     <div className="draft-card-head d-flex align-items-center gap-2">
                                         <input
                                             type="radio"
@@ -156,7 +196,17 @@ const SelectImg = function({ sessionId }) {
                                     </div>
 
                                     {draft.status === 'completed' ? (
-                                        <img src={draft.image_url} alt={label} className="draft-image" />
+                                        <img
+                                            src={draft.image_url}
+                                            alt={label}
+                                            className="draft-image protected-img"
+                                            draggable={false}
+                                            onClick={() => {
+                                                setSelectedId(draft.id);
+                                                setPreviewId(draft.id);
+                                            }}
+                                            onContextMenu={e => e.preventDefault()}
+                                        />
                                     ) : (
                                         <div className="draft-error">
                                             {draft.error_message ?? '생성에 실패했어요.'}
@@ -178,6 +228,13 @@ const SelectImg = function({ sessionId }) {
                     </div>
                 )}
 
+                {downloadError && (
+                    <div className="regen-error mt-3" role="alert">
+                        <i className="bi bi-exclamation-circle me-1"></i>
+                        다운로드하지 못했어요. ({downloadError})
+                    </div>
+                )}
+
                 <div className="d-flex align-items-center gap-2 mt-3">
                     <span className="footer-note me-auto">
                         <i className="bi bi-info-circle me-1"></i>
@@ -194,10 +251,40 @@ const SelectImg = function({ sessionId }) {
                         <i className="bi bi-arrow-clockwise"></i>
                         {regenerationUsed ? '다시 생성 완료' : '다시 생성 (1회)'}
                     </button>
-                    <button className="btn-proceed d-flex align-items-center gap-2" disabled={!selectedId}>
-                        {selectedLetter ? `${selectedLetter}안으로 다운로드` : '선택한 초안 다운로드'}
+                    <button
+                        type="button"
+                        className="btn-proceed d-flex align-items-center gap-2"
+                        onClick={handleDownload}
+                        disabled={!selectedId || isDownloading}
+                    >
+                        <i className={`bi ${isDownloading ? 'bi-hourglass-split' : 'bi-download'}`}></i>
+                        {isDownloading
+                            ? '다운로드 중...'
+                            : selectedLetter ? `${selectedLetter}안으로 다운로드` : '선택한 초안 다운로드'}
                     </button>
                 </div>
+
+                <Modal
+                    overlay
+                    isOpen={Boolean(previewDraft)}
+                    onClose={closePreview}
+                    title={previewDraft ? `${String.fromCharCode(65 + previewIndex)}안 · ${previewLabel}` : ""}
+                    headerExtra={previewDraft && selectedId === previewDraft.id && (
+                        <span className="selected-badge">
+                            <i className="bi bi-check-lg"></i> 선택됨
+                        </span>
+                    )}
+                >
+                    {previewDraft && (
+                        <img
+                            src={previewDraft.image_url}
+                            alt={previewLabel}
+                            className="preview-image protected-img"
+                            draggable={false}
+                            onContextMenu={e => e.preventDefault()}
+                        />
+                    )}
+                </Modal>
             </div>
         </div>
     );
